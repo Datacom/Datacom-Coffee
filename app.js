@@ -44,11 +44,10 @@ app.get('/', function (req, res) {
  * App listen.
  */
 
-app.listen(process.env.port, function () {  //Updated
+app.listen(port, function () {  //Updated
   var addr = app.address();
   console.log('   app listening on http://' + addr.address + ':' + addr.port);
 });
-
 /**
  * Socket.IO server (single process only)
  */
