@@ -1,81 +1,38 @@
-/**
- * Module dependencies.
- */
+// Setup basic express server
+// testing
+var express = require('express');
+var app = express();
+var path = require('path');
+var server = require('http').createServer(app);
+var bodyParser   = require('body-parser');
 
-var express = require('express')
-  , stylus = require('stylus')
-  , nib = require('nib')
-  , sio = require('socket.io'); 
 
-var port = process.env.PORT || 3000;  
+// var io = require('../..')(server);
+var io = require('socket.io')(server);
+var port = process.env.PORT || 3000;
 
-/**
- * App.
- */
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-var app = express.createServer();
+var routes = require('./API/Routes/Routes'); //importing route
+routes(app); //register the route
 
-/**
- * App configuration.
- */
+var googleHomeController = require('./API/Controllers/GoogleHomeController'); //importing route
+googleHomeController.SetIO(io);
 
-app.configure(function () {
-  app.use(stylus.middleware({ src: __dirname + '/public', compile: compile }));
-  app.use(express.static(__dirname + '/public'));
-  app.set('views', __dirname);
-  app.set('view engine', 'jade');
+var raspberrypiScreenController = require('./API/Controllers/RaspberrypiScreenController'); //importing route
+raspberrypiScreenController.SetIO(io);
 
-  function compile (str, path) {
-    return stylus(str)
-      .set('filename', path)
-      .use(nib());
-  };
+var raspberrypiPersonController = require('./API/Controllers/RaspberrypiPersonController'); //importing route
+raspberrypiPersonController.SetIO(io);
+
+var fitbitDataController = require('./API/Controllers/FitbitDataController'); //importing route
+fitbitDataController.SetIO(io);
+
+server.listen(port, () => {
+  console.log('Server listening at port %d', port);
 });
 
-/**
- * App routes.
- */
+// Routing
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', function (req, res) {
-  res.render('index', { layout: false });
-});
-
-/**
- * App listen.
- */
-
-app.listen(port, function () {  //Updated
-  var addr = app.address();
-  console.log('   app listening on http://' + addr.address + ':' + addr.port);
-});
-/**
- * Socket.IO server (single process only)
- */
-
-var io = sio.listen(app)
-  , nicknames = {};
-
-io.sockets.on('connection', function (socket) {
-  socket.on('user message', function (msg) {
-    socket.broadcast.emit('user message', socket.nickname, msg);
-  });
-
-  socket.on('nickname', function (nick, fn) {
-    if (nicknames[nick]) {
-      fn(true);
-    } else {
-      fn(false);
-      nicknames[nick] = socket.nickname = nick;
-      socket.broadcast.emit('announcement', nick + ' connected');
-      io.sockets.emit('nicknames', nicknames);
-    }
-  });
-
-  socket.on('disconnect', function () {
-    if (!socket.nickname) return;
-
-    delete nicknames[socket.nickname];
-    socket.broadcast.emit('announcement', socket.nickname + ' disconnected');
-    socket.broadcast.emit('nicknames', nicknames);
-  });
-});
