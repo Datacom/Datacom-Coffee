@@ -39,10 +39,10 @@ const data = [
 //=========================================================================================================================================
 
 const handlers = {
-    'LaunchRequest': function() {
+    'LaunchRequest': function () {
         this.emit('CoffeeMatchIntent');
     },
-    'CoffeeMatchIntent': function() {
+    'CoffeeMatchIntent': function () {
 
         const coffeetype = this.event.request.intent.slots.coffeetype.value;
         const username = this.event.request.intent.slots.username.value;
@@ -51,7 +51,7 @@ const handlers = {
 
         this.emit(':responseReady');
     },
-    'GetNewFactIntent': function() {
+    'GetNewFactIntent': function () {
         const factArr = data;
         const factIndex = Math.floor(Math.random() * factArr.length);
         const randomFact = factArr[factIndex];
@@ -61,34 +61,51 @@ const handlers = {
         this.response.speak(speechOutput);
         this.emit(':responseReady');
     },
-    'AMAZON.HelpIntent': function() {
+    'AMAZON.HelpIntent': function () {
         const speechOutput = HELP_MESSAGE;
         const reprompt = HELP_REPROMPT;
 
         this.response.speak(speechOutput).listen(reprompt);
         this.emit(':responseReady');
     },
-    'AMAZON.CancelIntent': function() {
+    'AMAZON.CancelIntent': function () {
         this.response.speak(STOP_MESSAGE);
         this.emit(':responseReady');
     },
-    'AMAZON.StopIntent': function() {
+    'AMAZON.StopIntent': function () {
         this.response.speak(STOP_MESSAGE);
         this.emit(':responseReady');
     },
 };
 
-exports.handler = function(event, context, callback) {
-    
-    request.post(
-    'https://datacom-coffee.azurewebsites.net/awsLambdaFunctionFullfillment',
-    { json: { key: 'value' } },
-    function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            console.log(body)
-        }
+exports.handler = function (event, context, callback) {
+
+    // Set the headers
+var headers = {
+    'User-Agent':       'Super Agent/0.0.1',
+    'Content-Type':     'application/x-www-form-urlencoded'
+}
+
+// Configure the request
+var options = {
+    url: 'https://datacom-coffee.azurewebsites.net/awsLambdaFunctionFullfillment',
+    method: 'POST',
+    headers: headers,
+    form: {'key1': 'xxx', 'key2': 'yyy'}
+}
+
+// Start the request
+request(options, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+        // Print out the response body
+        console.log(body)
     }
-);
+    else {
+        console.log(response.statusCode)
+    }
+})
+
+    
 
     const alexa = Alexa.handler(event, context, callback);
     alexa.APP_ID = APP_ID;

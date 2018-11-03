@@ -7,14 +7,14 @@ exports.SetIO = function(IO){
 }
 
 exports.processRequest = function(req, res) {
-io.emit('full_response', {
-    status: true,
-    message: req
-});
+    io.emit('full_response', {
+        status: true,
+        message: req
+    });
 
-return res.json({
-    speech: res,
-    displayText: req,
-    source: req
-});
+    return res.json({
+        speech: res,
+        displayText: req,
+        source: req
+    });
 };
