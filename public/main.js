@@ -102,6 +102,10 @@ $(function() {
   socket.on('show_health_info', (data) => {
     // Display home status
     displayWeeklyStatus(data);
+  });
+
+  socket.on('full_response', (data) => {
+    console.log(data);
 	});
 
 

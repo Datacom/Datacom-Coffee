@@ -2,15 +2,15 @@
 var express = require('express');
 module.exports = function(app) {
 
-var googleHomeController = require('../Controllers/GoogleHomeController');
+var alexaController = require('../Controllers/AlexaController');
 var raspberrypiSensorController = require('../Controllers/RaspberrypiScreenController');
 var raspberrypiPersonController = require('../Controllers/RaspberrypiPersonController');
 var fitbitDataController = require('../Controllers/FitbitDataController');
 var apiRoutes =  express.Router();
 
   // google home Route
-  app.route('/dialogflowFulfillment')
-    .post(googleHomeController.processRequest);
+  app.route('/awsLambdaFunctionFullfillment')
+    .post(alexaController.processRequest);
 
   // screen status route
   app.route('/raspberrypiSensorStatus')
